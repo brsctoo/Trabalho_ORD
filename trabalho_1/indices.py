@@ -108,7 +108,7 @@ def salvar_indices(indice_id, indice_gen, indice_pub, lista_invertida):
     # primário.ind -> id|offset
     # genero.ind -> genero|rrn
     # publicadora.ind -> publicadora|rrn
-    # lista_invertida.ind -> id|prox_gen|prox_pub
+    # lista_invertida.lst -> id|prox_gen|prox_pub
 
     saida = open('primario.ind', 'w')
     for i in range(len(indice_id)):
@@ -131,10 +131,10 @@ def salvar_indices(indice_id, indice_gen, indice_pub, lista_invertida):
         saida.write(publicadora + '|' + rrn + '\n') # Escreve no publicadora.ind -> publicadora|rrn
     saida.close()
 
-    saida = open('lista_invertida.ind', 'w', encoding='utf-8')
+    saida = open('lista_invertida.lst', 'w', encoding='utf-8')
     for i in range(len(lista_invertida)):
         jogo_id = lista_invertida[i][0]
         prox_gen = str(lista_invertida[i][1])
         prox_pub = str(lista_invertida[i][2])
-        saida.write(jogo_id + '|' + prox_gen + '|' + prox_pub + '\n') # Escreve no lista_invertida.ind -> id|prox_gen|prox_pub
+        saida.write(jogo_id + '|' + prox_gen + '|' + prox_pub + '\n') # Escreve no lista_invertida.lst -> id|prox_gen|prox_pub
     saida.close()
