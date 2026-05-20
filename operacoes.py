@@ -44,7 +44,7 @@ def busca_primaria(id: int) -> str:
         return f"Registro de ID '{id}' não encontrado."
 
 
-def realizar_operacao(arquivo: str) -> None:
+def realizar_operacao(arquivo: str, listas: tuple) -> None:
     with open(arquivo, "r") as file:
         for linha in file:
             operacao = identificar_operacao(linha)

@@ -14,6 +14,8 @@ import operacoes
 def main():
     flags = sys.argv
 
+    listas = indices.carregar_indices()
+
     if flags[1] == "-b":
         try:
             open("games.dat", "rb")
@@ -46,7 +48,7 @@ def main():
             except FileNotFoundError:
                 print(f"O arquivo {arquivo} não foi encontrado.")
                 return
-        operacoes.realizar_operacao(f"{sys.argv[2]}.txt")
+        operacoes.realizar_operacao(f"{sys.argv[2]}.txt", listas)
     return
 
 
