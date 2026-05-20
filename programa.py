@@ -42,7 +42,7 @@ def main():
             except FileNotFoundError:
                 print(f"O arquivo {arquivo} não foi encontrado.")
                 return
-
+        operacoes.realizar_operacao(f"{sys.argv[2]}.txt")
     return
 
 
