@@ -110,28 +110,30 @@ def salvar_indices(indice_id, indice_gen, indice_pub, lista_invertida):
     # publicadora.ind -> publicadora|rrn
     # lista_invertida.lst -> id|prox_gen|prox_pub
 
-    saida = open('primario.ind', 'w')
+    os.makedirs('output', exist_ok=True)
+
+    saida = open('output/primario.ind', 'w')
     for i in range(len(indice_id)):
         chave = indice_id[i][0]
         offset = str(indice_id[i][1])
         saida.write(chave + '|' + offset + '\n')  # Escreve no primario.ind -> id|offset
     saida.close()
 
-    saida = open('genero.ind', 'w', encoding='utf-8')
+    saida = open('output/genero.ind', 'w', encoding='utf-8')
     for i in range(len(indice_gen)):
         genero = indice_gen[i][0]
         rrn = str(indice_gen[i][1])
         saida.write(genero + '|' + rrn + '\n') # Escreve no genero.ind -> genero|rrn
     saida.close()
 
-    saida = open('publicadora.ind', 'w', encoding='utf-8')
+    saida = open('output/publicadora.ind', 'w', encoding='utf-8')
     for i in range(len(indice_pub)):
         publicadora = indice_pub[i][0]
         rrn = str(indice_pub[i][1])
         saida.write(publicadora + '|' + rrn + '\n') # Escreve no publicadora.ind -> publicadora|rrn
     saida.close()
 
-    saida = open('lista_invertida.lst', 'w', encoding='utf-8')
+    saida = open('output/lista_invertida.lst', 'w', encoding='utf-8')
     for i in range(len(lista_invertida)):
         jogo_id = lista_invertida[i][0]
         prox_gen = str(lista_invertida[i][1])
