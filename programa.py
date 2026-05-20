@@ -7,7 +7,6 @@ Arquivo principal, executável que realiza as operações dependendo das flags p
 
 import sys
 
-import temporario
 import indices
 import operacoes
 
@@ -22,7 +21,11 @@ def main():
             print("Arquivo de registros 'games.dat' não encontrado.")
             return
         listas = indices.criar_indices()
-        indices.salvar_indices(listas[0], listas[1], listas[2], listas[3])
+
+        indices.salvar_indice(listas[0], "primario.ind")
+        indices.salvar_indice(listas[1], "genero.ind")
+        indices.salvar_indice(listas[2], "publicadora.ind")
+        indices.salvar_lista_invertida(listas[3], "lista_invertida.lst")
 
     elif flags[1] == "-e":
         try:

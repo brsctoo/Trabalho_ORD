@@ -111,48 +111,36 @@ def criar_indices():
     return (indice_id, indice_gen, indice_pub, lista_invertida)
 
 
-def salvar_indices(indice_id, indice_gen, indice_pub, lista_invertida):
-    # Salva os índices em arquivos de texto, seguindo o formato especificado:
+def salvar_indice(indice: list, nome_arq: str):
+    # Salva o índice em arquivos de texto, de nome nome_arq
+    # Seguindo o formato especificado:
     # primário.ind -> id|offset
     # genero.ind -> genero|rrn
     # publicadora.ind -> publicadora|rrn
-    # lista_invertida.lst -> id|prox_gen|prox_pub
 
     os.makedirs("output", exist_ok=True)
 
-    saida = open("output/primario.ind", "w")
-    for i in range(len(indice_id)):
-        chave = indice_id[i][0]
-        offset = str(indice_id[i][1])
-        saida.write(
-            str(chave) + "|" + offset + "\n"
-        )  # Escreve no primario.ind -> id|offset
+    saida = open(f"output/{nome_arq}", "w")
+    for i in range(len(indice)):
+        chave = indice[i][0]
+        ref = str(indice[i][1])
+        saida.write(str(chave) + "|" + ref + "\n")  # Escreve no arquivo
     saida.close()
 
-    saida = open("output/genero.ind", "w", encoding="utf-8")
-    for i in range(len(indice_gen)):
-        genero = indice_gen[i][0]
-        rrn = str(indice_gen[i][1])
-        saida.write(genero + "|" + rrn + "\n")  # Escreve no genero.ind -> genero|rrn
-    saida.close()
 
-    saida = open("output/publicadora.ind", "w", encoding="utf-8")
-    for i in range(len(indice_pub)):
-        publicadora = indice_pub[i][0]
-        rrn = str(indice_pub[i][1])
-        saida.write(
-            publicadora + "|" + rrn + "\n"
-        )  # Escreve no publicadora.ind -> publicadora|rrn
-    saida.close()
+def salvar_lista_invertida(lista_invertida: list, nome_arq: str):
+    # Salva a lista invertida em arquivos de texto de nome nome_arq
 
-    saida = open("output/lista_invertida.lst", "w", encoding="utf-8")
+    os.makedirs("output", exist_ok=True)
+
+    saida = open(f"output/{nome_arq}", "w", encoding="utf-8")
     for i in range(len(lista_invertida)):
         jogo_id = lista_invertida[i][0]
         prox_gen = str(lista_invertida[i][1])
         prox_pub = str(lista_invertida[i][2])
         saida.write(
             jogo_id + "|" + prox_gen + "|" + prox_pub + "\n"
-        )  # Escreve no lista_invertida.lst -> id|prox_gen|prox_pub
+        )  # Escreve no arquivo texto -> id|prox_gen|prox_pub
     saida.close()
 
 
