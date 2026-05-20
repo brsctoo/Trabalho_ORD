@@ -44,7 +44,7 @@ def criar_indices():
             publicadora = campos[4]
 
             rnn_atual = len(indice_id) # Posição do registro atual no índice primário
-            indice_id.append([jogo_id, offset])
+            indice_id.append([int(jogo_id), int(offset)])
             registro_inv = [jogo_id, -1, -1] # Registro para a lista invertida
 
             # Se o gênero está na lista de gêneros:
@@ -90,8 +90,12 @@ def criar_indices():
             lista_invertida.append(registro_inv) # Adiciona o registro invertido na lista invertida
 
 
-        offset += 2 + len(buffer) # Atualiza o offset
+        offset += 2 + len(buffer.encode('utf-8')) # Atualiza o offset
         buffer = leia_reg(entrada)
+
+    indice_id.sort() # Ordena o índice primário por ID
+    indice_gen.sort() # Ordena o índice secundário de gênero por gênero
+    indice_pub.sort() # Ordena o índice secundário de publicadora por publicadora
 
     entrada.close()
 
@@ -110,7 +114,7 @@ def salvar_indices(indice_id, indice_gen, indice_pub, lista_invertida):
     for i in range(len(indice_id)):
         chave = indice_id[i][0]
         offset = str(indice_id[i][1])
-        saida.write(chave + '|' + offset + '\n')  # Escreve no primario.ind -> id|offset
+        saida.write(f'{chave}|{offset}')  # Escreve no primario.ind -> id|offset
     saida.close()
 
     saida = open('output/genero.ind', 'w', encoding='utf-8')
@@ -134,3 +138,42 @@ def salvar_indices(indice_id, indice_gen, indice_pub, lista_invertida):
         prox_pub = str(lista_invertida[i][2])
         saida.write(jogo_id + '|' + prox_gen + '|' + prox_pub + '\n') # Escreve no lista_invertida.lst -> id|prox_gen|prox_pub
     saida.close()
+
+def carregar_indices():
+    try:
+        with open('output/primario.ind', 'r') as indice_pimario:
+            indice_id = []
+            for linha in indice_pimario:
+                campos = linha.strip().split('|')
+                indice_id.append([campos[0], int(campos[1])]) # Lê o primário.ind -> id|offset
+    except FileNotFoundError:
+        print("Arquivo 'primario.ind' não encontrado.")
+
+    try:
+        with open('output/genero.ind', 'r', encoding='utf-8') as indice_secundario_genero:
+            indice_gen = []
+            for linha in indice_secundario_genero:
+                campos = linha.strip().split('|')
+                indice_gen.append([campos[0], int(campos[1])]) # Lê o genero.ind -> genero|rrn
+    except FileNotFoundError:
+        print("Arquivo 'genero.ind' não encontrado.")
+
+    try:
+        with open('output/publicadora.ind', 'r', encoding='utf-8') as indice_secundario_publicadora:
+            indice_pub = []
+            for linha in indice_secundario_publicadora:
+                campos = linha.strip().split('|')
+                indice_pub.append([campos[0], int(campos[1])]) # Lê o publicadora.ind -> publicadora|rrn
+    except FileNotFoundError:
+        print("Arquivo 'publicadora.ind' não encontrado.")
+
+    try:
+        with open('output/lista_invertida.lst', 'r', encoding='utf-8') as lista_invertida_file:
+            lista_invertida = []
+            for linha in lista_invertida_file:
+                campos = linha.strip().split('|')
+                lista_invertida.append([campos[0], int(campos[1]), int(campos[2])]) # Lê o lista_invertida.lst -> id|prox_gen|prox_pub
+    except FileNotFoundError:
+        print("Arquivo 'lista_invertida.lst' não encontrado.")
+
+    return (indice_id, indice_gen, indice_pub, lista_invertida)
