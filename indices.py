@@ -124,7 +124,9 @@ def salvar_indices(indice_id, indice_gen, indice_pub, lista_invertida):
     for i in range(len(indice_id)):
         chave = indice_id[i][0]
         offset = str(indice_id[i][1])
-        saida.write(f"{chave}|{offset}")  # Escreve no primario.ind -> id|offset
+        saida.write(
+            str(chave) + "|" + offset + "\n"
+        )  # Escreve no primario.ind -> id|offset
     saida.close()
 
     saida = open("output/genero.ind", "w", encoding="utf-8")
