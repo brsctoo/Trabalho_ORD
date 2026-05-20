@@ -29,16 +29,10 @@ def criar_indices():
     indice_pub = []
     lista_invertida = []
 
-    # Testa se o arquivo games.dat existe
-    try:
-        entrada = open('games.dat', 'rb')
-    except FileNotFoundError:
-        return None, None, None, None
-
     entrada = open('games.dat' , 'rb')
 
     offset = 0 # Inicia o arquivo do começo
-    buffer = leia_reg(entrada);
+    buffer = leia_reg(entrada)
 
     while buffer != '':
 
