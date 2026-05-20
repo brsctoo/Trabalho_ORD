@@ -7,6 +7,7 @@ Arquivo principal, executável que realiza as operações dependendo das flags p
 
 import sys
 
+import compactacao
 import indices
 import operacoes
 
@@ -24,11 +25,11 @@ def main():
             return
         listas = indices.criar_indices()
 
+        # Salva os índices em arquivos de texto e a lista invertida em um arquivo de texto, seguindo o formato especificado
         indices.salvar_indice(listas[0], "primario.ind")
         indices.salvar_indice(listas[1], "genero.ind")
         indices.salvar_indice(listas[2], "publicadora.ind")
         indices.salvar_lista_invertida(listas[3], "lista_invertida.lst")
-
     elif flags[1] == "-e":
         try:
             open(f"{sys.argv[2]}.txt")
@@ -49,6 +50,13 @@ def main():
                 print(f"O arquivo {arquivo} não foi encontrado.")
                 return
         operacoes.realizar_operacao(f"{sys.argv[2]}.txt", listas)
+    elif flags[1] == "-c":
+        try:
+            open("games.dat", "rb")
+        except FileNotFoundError:
+            print("Arquivo de registros 'games.dat' não encontrado.")
+            return
+        compactacao.compactar_arquivo(listas[0])
     return
 
 

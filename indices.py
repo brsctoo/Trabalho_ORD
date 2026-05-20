@@ -43,7 +43,7 @@ def criar_indices():
             genero = campos[3]
             publicadora = campos[4]
 
-            rnn_atual = len(indice_id)  # Posição do registro atual no índice primário
+            rrn_atual = len(indice_id)  # Posição do registro atual no índice primário
             indice_id.append([int(jogo_id), int(offset)])
             registro_inv = [jogo_id, -1, -1]  # Registro para a lista invertida
 
@@ -65,11 +65,11 @@ def criar_indices():
                     1
                 ]  # O novo aponta para o velho -> Entra na cabeça da lista
                 indice_gen[idx_gen][1] = (
-                    rnn_atual  # O genêro no indice_gen agora aponta pro o novo
+                    rrn_atual  # O genêro no indice_gen agora aponta pro o novo
                 )
             else:
                 # Não está na lista
-                indice_gen.append([genero, rnn_atual])
+                indice_gen.append([genero, rrn_atual])
 
             # Se a publicadora está na lista de publicadoras:
             # - Chave primária na lista invertida -> aponta para o rnn do último registro com a mesma publicadora.
@@ -89,11 +89,11 @@ def criar_indices():
                     1
                 ]  # O novo aponta para o velho -> Entra na cabeça da lista
                 indice_pub[idx_pub][1] = (
-                    rnn_atual  # O genêro no indice_gen agora aponta pro o novo
+                    rrn_atual  # O genêro no indice_gen agora aponta pro o novo
                 )
             else:
                 # Não está na lista
-                indice_pub.append([publicadora, rnn_atual])
+                indice_pub.append([publicadora, rrn_atual])
 
             lista_invertida.append(
                 registro_inv
