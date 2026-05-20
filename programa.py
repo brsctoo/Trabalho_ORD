@@ -7,6 +7,7 @@ Arquivo principal, executável que realiza as operações dependendo das flags p
 
 import sys
 
+import temporario
 import indices
 import operacoes
 
