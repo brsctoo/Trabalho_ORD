@@ -1,10 +1,12 @@
 """
-Arquivo responsável pela construção, buscas, inserção e remoção nos índices:
-# bp -> busca um registro pelo índice primário (ID);
-# bs1 -> busca registros pelo índice secundário de gênero;
-# bs2 -> busca registros pelo índice secundário de publicadora;
-# i -> insere um novo registro no arquivo games.dat e atualiza os índices;
-# r -> remove logicamente um registro do arquivo games.dat e atualiza os índices.
+Arquivo responsável pelas operações nos índices lineares:
+# primário: índice pelo ID do jogo;
+# gênero: índice secundário por gênero;
+# publicadora: índice secundário por publicadora;
+
+Além da construção, cuida do carregamento, salvamento e atualização dos índices em memória.
+
+Obs. Para os índices secundários, é usado lista invertida com late binding.
 """
 
 import os
