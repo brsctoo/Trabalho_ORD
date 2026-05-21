@@ -61,12 +61,11 @@ def criar_indices():
 
             # Está na lista
             if idx_gen != -1:
-                registro_inv[1] = indice_gen[idx_gen][
-                    1
-                ]  # O novo aponta para o velho -> Entra na cabeça da lista
-                indice_gen[idx_gen][1] = (
-                    rrn_atual  # O genêro no indice_gen agora aponta pro o novo
-                )
+                # O novo aponta para o velho -> Entra na cabeça da lista
+                registro_inv[1] = indice_gen[idx_gen][1]
+
+                # O genêro no indice_gen agora aponta pro o novo
+                indice_gen[idx_gen][1] = rrn_atual
             else:
                 # Não está na lista
                 indice_gen.append([genero, rrn_atual])

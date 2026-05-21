@@ -119,6 +119,9 @@ def inserir_jogo(jogo: str, listas: tuple) -> None:
     # O registro deve ser inserido no final do arquivo 'games.dat' e os índices devem ser atualizados
 
     indice_id = listas[0]
+    indice_gen = listas[1]
+    indice_pub = listas[2]
+    lista_invertida = listas[3]
 
     campos = jogo.split("|")
     id_jogo = int(campos[0])
@@ -132,13 +135,47 @@ def inserir_jogo(jogo: str, listas: tuple) -> None:
 
     tam_int = len(reg_bytes)
     tam_bytes = tam_int.to_bytes(2, "little")
-    print(f"Inserindo jogo com ID '{id_jogo}' no final do arquivo.")
+    print(f"Inserindo jogo com ID {id_jogo} e {tam_int} bytes.")
 
     saida = open("games.dat", "ab")
+
     saida.write(tam_bytes)  # Escreve o tamanho do registro (2 bytes)
     saida.write(reg_bytes)  # Escreve o registro em bytes no final do arquivo
+
+    offset = saida.tell() - (2 + tam_int)  # Calcula o offset do novo registro
     saida.close()
 
+    # Atualiza os índices em memória
+    indice_id.append([id_jogo, offset])  # Adiciona o novo jogo ao índice primário
+
+    rrn = len(lista_invertida)  # Próximo índice da lista invertida
+    registro_inv = [campos[0], "-1", "-1"]  # id|prox_gen|prox_pub
+
+    # Se o genêro já existir no índice secundário de gênero, atualiza a referência na lista invertida
+    # Coloca na cabeça da lista encadeada
+    for i in range(len(indice_gen)):
+        if indice_gen[i][0] == campos[3]:
+            ref_atual_gen = indice_gen[i][1]  # Obtém a referência atual do gênero
+            indice_gen[i][1] = rrn  # Atualiza a referência do gênero
+            lista_invertida[rrn][1] = ref_atual_gen  # Atualiza a referência
+            registro_inv[1] = ref_atual_gen  # novo -> velho
+            break
+        else:
+            indice_gen.append([campos[1], rrn])
+            break
+
+    for i in range(len(indice_pub)):
+        if indice_pub[i][0] == campos[4]:
+            ref_atual_pub = indice_pub[i][1]  # Obtém a referência atual do gênero
+            indice_pub[i][1] = rrn  # Atualiza a referência do gênero
+            lista_invertida[rrn][1] = ref_atual_pub  # Atualiza a referência
+            registro_inv[2] = ref_atual_pub  # novo -> velho
+            break
+        else:
+            indice_pub.append([campos[1], rrn])
+            break
+
+    lista_invertida.append(registro_inv)  # Adiciona o novo registro à lista invertida
     return
 
 
@@ -153,6 +190,7 @@ def realizar_operacao(arquivo: str, listas: tuple) -> None:
                     print(f"Busca pelo registro de ID '{argumento}'")
                     registro = busca_primaria(int(argumento), index_primario)
                     print(registro)
+                    print("\n")
                 case "bs1":
                     print(f"Busca por registros de gênero '{argumento}'")
                     registros = busca_secundaria(
@@ -161,6 +199,7 @@ def realizar_operacao(arquivo: str, listas: tuple) -> None:
                     print(f"Foram encontrados {len(registros)} registros: ")
                     for registro in registros:
                         print(registro)
+                    print("\n")
                 case "bs2":
                     print(f"Busca por registros da publicadora '{argumento}'")
                     registros = busca_secundaria(
@@ -169,12 +208,15 @@ def realizar_operacao(arquivo: str, listas: tuple) -> None:
                     print(f"Foram encontrados {len(registros)} registros: ")
                     for registro in registros:
                         print(registro)
+                    print("\n")
                 case "i":
                     print("Realizando inserção de um novo registro")
                     inserir_jogo(argumento, listas)
+                    print("\n")
                 case "r":
                     print("Realizando remoção lógica de um registro")
                     remover_jogo(int(argumento), listas[0], listas[3])
+                    print("\n")
                 case _:
                     print(
                         f"Operação {operacao} não encontrada, prosseguindo para a próxima."
