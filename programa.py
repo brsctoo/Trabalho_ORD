@@ -15,8 +15,6 @@ import operacoes
 def main():
     flags = sys.argv
 
-    listas = indices.carregar_indices()
-
     if flags[1] == "-b":
         try:
             open("games.dat", "rb")
@@ -51,6 +49,8 @@ def main():
             except FileNotFoundError:
                 print(f"O arquivo {arquivo} não foi encontrado.")
                 return
+
+        listas = indices.carregar_indices()  # Só carrega se existir
         operacoes.realizar_operacao(f"{sys.argv[2]}.txt", listas)
     elif flags[1] == "-c":
         try:
@@ -58,6 +58,18 @@ def main():
         except FileNotFoundError:
             print("Arquivo de registros 'games.dat' não encontrado.")
             return
+
+        arquivos_necessarios = [
+            "primario.ind",
+        ]
+        for arquivo in arquivos_necessarios:
+            try:
+                open(f"output/{arquivo}")
+            except FileNotFoundError:
+                print(f"O arquivo {arquivo} não foi encontrado.")
+                return
+
+        listas = indices.carregar_indices()  # Só carrega se existir
         compactacao.compactar_arquivo(listas[0])
     return
 
