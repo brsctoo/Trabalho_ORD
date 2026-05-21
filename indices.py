@@ -152,11 +152,11 @@ def carregar_indices():
         for linha in indice_pimario:
             campos = linha.strip().split("|")
             indice_id.append(
-                [campos[0], int(campos[1])]
+                [int(campos[0]), int(campos[1])]
             )  # Lê o primário.ind -> id|offset:
 
     with open("output/genero.ind", "r", encoding="utf-8") as indice_secundario_genero:
-        indice_gen = []
+        indice_gen = [] 
         for linha in indice_secundario_genero:
             campos = linha.strip().split("|")
             indice_gen.append(

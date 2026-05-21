@@ -20,6 +20,20 @@ def identificar_argumentos(linha: str) -> str:
     return linha.strip().split(" ", 1)[1]
 
 
+def busca_binaria_indice(x: str | int, lista: list) -> int:
+    i = 0
+    f = len(lista) - 1
+    while i <= f:
+        m = (i + f) // 2
+        if lista[m][0] == x:
+            return m
+        if lista[m][0] < x:
+            i = m + 1
+        else:
+            f = m - 1
+    return -1
+
+
 def busca_offset(offset: int) -> str:
     with open("games.dat", "rb") as arq:
         arq.seek(offset)
@@ -30,20 +44,34 @@ def busca_offset(offset: int) -> str:
         return ""
 
 
-def busca_primaria(id: int) -> str:
-    lista_indices = []
-    with open("output/primario.ind", "r") as index_primario:
-        for linha in index_primario:
-            campos = linha.split("|")
-            id_primario = int(campos[0])
-            ref_offset = int(campos[1])
-            lista_indices.append([id_primario, ref_offset])
-    for i in range(len(lista_indices)):
-        if lista_indices[i][0] == id:
-            registro = busca_offset(lista_indices[i][1])
-            return registro
+def busca_primaria(id: int, index_primario: list[list[int]]) -> str:
+    offset = busca_binaria_indice(id, index_primario)
+    if offset == -1:
+        return f"Registro com ID '{id}' não encontrado."
     else:
-        return f"Registro de ID '{id}' não encontrado."
+        return busca_offset(index_primario[offset][1])
+
+
+def busca_secundaria(
+    chave: str,
+    index_secundario: list,
+    index_primario: list,
+    lista_invertida: list,
+    indice_lista_invertida: int = 1,
+) -> list[int]:
+    resultado = []
+    rrn = busca_binaria_indice(chave, index_secundario)
+    if rrn == -1:
+        print(f"Nenhum registro com '{chave}' não encontrado.")
+    else:
+        prox_gen = index_secundario[rrn][1]
+        while prox_gen != -1:
+            resultado.append(
+                busca_primaria(int(lista_invertida[prox_gen][0]), index_primario)
+            )
+            prox_gen = lista_invertida[prox_gen][indice_lista_invertida]
+
+    return resultado
 
 
 def remover_jogo(
@@ -115,6 +143,7 @@ def inserir_jogo(jogo: str, listas: tuple) -> None:
 
 
 def realizar_operacao(arquivo: str, listas: tuple) -> None:
+    index_primario, index_genero, index_publicadora, lista_invertida = listas
     with open(arquivo, "r") as file:
         for linha in file:
             operacao = identificar_operacao(linha)
@@ -122,11 +151,24 @@ def realizar_operacao(arquivo: str, listas: tuple) -> None:
             match operacao:
                 case "bp":
                     print(f"Busca pelo registro de ID '{argumento}'")
-                    print(busca_primaria(int(argumento)))
+                    registro = busca_primaria(int(argumento), index_primario)
+                    print(registro)
                 case "bs1":
-                    print("Realizando busca pelo índice secundário de gênero")
+                    print(f"Busca por registros de gênero '{argumento}'")
+                    registros = busca_secundaria(
+                        argumento, index_genero, index_primario, lista_invertida
+                    )
+                    print(f"Foram encontrados {len(registros)} registros: ")
+                    for registro in registros:
+                        print(registro)
                 case "bs2":
-                    print("Realizando busca pelo índice secundário de publicadora")
+                    print(f"Busca por registros da publicadora '{argumento}'")
+                    registros = busca_secundaria(
+                        argumento, index_publicadora, index_primario, lista_invertida, 2
+                    )
+                    print(f"Foram encontrados {len(registros)} registros: ")
+                    for registro in registros:
+                        print(registro)
                 case "i":
                     print("Realizando inserção de um novo registro")
                     inserir_jogo(argumento, listas)
