@@ -130,9 +130,6 @@ def inserir_jogo(jogo: str, index_primario, index_genero, index_publicadora, lis
     saida.close()
 
     index_primario.append([id_jogo, offset])
-    index_primario.sort()
-    index_genero.sort()
-    index_publicadora.sort()
 
     rrn = len(lista_invertida)
     registro_inv = [campos[0], -1, -1]
@@ -142,6 +139,10 @@ def inserir_jogo(jogo: str, index_primario, index_genero, index_publicadora, lis
 
     registro_inv = [id_jogo, prox_genero, prox_pub]
     lista_invertida.append(registro_inv)
+
+    index_primario.sort()
+    index_genero.sort()
+    index_publicadora.sort()
 
     indices.salvar_indice(index_primario, "primario.ind")
     indices.salvar_indice(index_genero, "genero.ind")
