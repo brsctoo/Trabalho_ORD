@@ -23,6 +23,7 @@ def main():
         except FileNotFoundError:
             print("Arquivo de registros 'games.dat' não encontrado.")
             return
+
         listas = indices.criar_indices()
 
         # Salva os índices em arquivos de texto e a lista invertida em um arquivo de texto, seguindo o formato especificado
@@ -30,6 +31,7 @@ def main():
         indices.salvar_indice(listas[1], "genero.ind")
         indices.salvar_indice(listas[2], "publicadora.ind")
         indices.salvar_lista_invertida(listas[3], "lista_invertida.lst")
+
     elif flags[1] == "-e":
         try:
             open(f"{sys.argv[2]}.txt")

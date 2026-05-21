@@ -22,92 +22,84 @@ def leia_reg(entrada):
     return ""
 
 
-def criar_indices():
-    # Lê o arquivo games.dat e constrói os quatro índices em memória
+def encontra_posicao(
+    index_chave: list, chave_secundaria: str, rrn_jogo: int, lista_invertida: list, id: int, coluna: int
+) -> int:
+    prox = -1
 
-    indice_id = []
-    indice_gen = []
-    indice_pub = []
+    # Procura se já está no índice secundário de gênero
+    posicao_chave = -1
+    for i in range(len(index_chave)):
+        if index_chave[i][0] == chave_secundaria:
+            posicao_chave = i  # Posição no índice
+            break
+
+    if posicao_chave != -1:  # Se está no índice
+        # RRN que o gênero aponta -> Começa pelo RRN do índice
+        rrn_apontado = int(index_chave[posicao_chave][1])
+        rrn_anterior = -1
+
+        while rrn_apontado != -1:
+            id_comparado = int(lista_invertida[rrn_apontado][0])
+
+            if id_comparado > int(id):
+                break
+
+            # Se o ID jogador é maior, ele o RRN como anterior e vai pro próximo
+            rrn_anterior = rrn_apontado
+            rrn_apontado = int(lista_invertida[rrn_apontado][coluna])
+
+        prox = rrn_apontado
+
+        # Se for o menor, coloca na cabeça. Se não, coloca no lugar certo.
+        if rrn_anterior == -1:
+            index_chave[posicao_chave][1] = rrn_jogo
+        else:
+            lista_invertida[rrn_anterior][coluna] = rrn_jogo
+    else:
+        index_chave.append([chave_secundaria, rrn_jogo])
+
+    return prox
+
+
+def criar_indices():
+    index_id = []
+    index_genero = []
+    index_publicadora = []
     lista_invertida = []
 
     entrada = open("games.dat", "rb")
 
-    offset = 0  # Inicia o arquivo do começo
-    buffer = leia_reg(entrada)
+    offset = 0
+    buffer_registro = leia_reg(entrada)
 
-    while buffer != "":
-        if buffer[0] != "*":
-            # Divide o campo com a função split e guarda os dados em variáveis
-            campos = buffer.split("|")
-            jogo_id = campos[0]
+    while buffer_registro != "":
+        if buffer_registro[0] != "*":
+            campos = buffer_registro.split("|")
+            id = int(campos[0])
             genero = campos[3]
             publicadora = campos[4]
 
-            rrn_atual = len(indice_id)  # Posição do registro atual no índice primário
-            indice_id.append([int(jogo_id), int(offset)])
-            registro_inv = [jogo_id, -1, -1]  # Registro para a lista invertida
+            rrn_jogo = len(index_id)
+            index_id.append([int(id), int(offset)])
 
-            # Se o gênero está na lista de gêneros:
-            # - Chave primária na lista invertida -> aponta para o rnn do último registro com o mesmo gênero.
-            # Se o gênero não está na lista de gêneros:
-            # - Adicionamos ele na lista de gênero, com referência ao rnn atual;
-            # - Chave primária na lista invertida -> aponta para -1.
+            prox_genero = encontra_posicao(index_genero, genero, rrn_jogo, lista_invertida, id, 1)
+            prox_pub = encontra_posicao(index_publicadora, publicadora, rrn_jogo, lista_invertida, id, 2)
 
-            idx_gen = -1  # Index de onde o gênero está na lista de gêneros
-            for i in range(len(indice_gen)):
-                if indice_gen[i][0] == genero:
-                    idx_gen = i
-                    break
+            registro_invertido = [id, prox_genero, prox_pub]
 
-            # Está na lista
-            if idx_gen != -1:
-                # O novo aponta para o velho -> Entra na cabeça da lista
-                registro_inv[1] = indice_gen[idx_gen][1]
+            lista_invertida.append(registro_invertido)
 
-                # O genêro no indice_gen agora aponta pro o novo
-                indice_gen[idx_gen][1] = rrn_atual
-            else:
-                # Não está na lista
-                indice_gen.append([genero, rrn_atual])
+        offset += 2 + len(buffer_registro.encode("utf-8"))
+        buffer_registro = leia_reg(entrada)
 
-            # Se a publicadora está na lista de publicadoras:
-            # - Chave primária na lista invertida -> aponta para o rnn do último registro com a mesma publicadora.
-            # Se a publicadora não está na lista de publicadoras:
-            # - Adicionamos ele na lista de publicadoras, com referência ao rnn atual;
-            # - Chave primária na lista invertida -> aponta para -1.
-
-            idx_pub = -1  # Index de onde a publicadora está na lista de publicadoras
-            for i in range(len(indice_pub)):
-                if indice_pub[i][0] == publicadora:
-                    idx_pub = i
-                    break
-
-            # Está na lista
-            if idx_pub != -1:
-                registro_inv[2] = indice_pub[idx_pub][
-                    1
-                ]  # O novo aponta para o velho -> Entra na cabeça da lista
-                indice_pub[idx_pub][1] = (
-                    rrn_atual  # O genêro no indice_gen agora aponta pro o novo
-                )
-            else:
-                # Não está na lista
-                indice_pub.append([publicadora, rrn_atual])
-
-            lista_invertida.append(
-                registro_inv
-            )  # Adiciona o registro invertido na lista invertida
-
-        offset += 2 + len(buffer.encode("utf-8"))  # Atualiza o offset
-        buffer = leia_reg(entrada)
-
-    indice_id.sort()  # Ordena o índice primário por ID
-    indice_gen.sort()  # Ordena o índice secundário de gênero por gênero
-    indice_pub.sort()  # Ordena o índice secundário de publicadora por publicadora
+    index_id.sort()
+    index_genero.sort()
+    index_publicadora.sort()
 
     entrada.close()
 
-    return (indice_id, indice_gen, indice_pub, lista_invertida)
+    return (index_id, index_genero, index_publicadora, lista_invertida)
 
 
 def salvar_indice(indice: list, nome_arq: str):
@@ -138,7 +130,7 @@ def salvar_lista_invertida(lista_invertida: list, nome_arq: str):
         prox_gen = str(lista_invertida[i][1])
         prox_pub = str(lista_invertida[i][2])
         saida.write(
-            jogo_id + "|" + prox_gen + "|" + prox_pub + "\n"
+            str(jogo_id) + "|" + prox_gen + "|" + prox_pub + "\n"
         )  # Escreve no arquivo texto -> id|prox_gen|prox_pub
     saida.close()
 
@@ -147,38 +139,28 @@ def carregar_indices():
     # Carrega os índices dos arquivos de texto para estruturas de dados em memória, seguindo o formato especificado
 
     with open("output/primario.ind", "r") as indice_pimario:
-        indice_id = []
+        index_primario = []
         for linha in indice_pimario:
             campos = linha.strip().split("|")
-            indice_id.append(
-                [int(campos[0]), int(campos[1])]
-            )  # Lê o primário.ind -> id|offset:
+            index_primario.append([int(campos[0]), int(campos[1])])  # Lê o primário.ind -> id|offset:
 
     with open("output/genero.ind", "r", encoding="utf-8") as indice_secundario_genero:
-        indice_gen = [] 
+        index_genero = []
         for linha in indice_secundario_genero:
             campos = linha.strip().split("|")
-            indice_gen.append(
-                [campos[0], int(campos[1])]
-            )  # Lê o genero.ind -> genero|rrn
+            index_genero.append([campos[0], int(campos[1])])  # Lê o genero.ind -> genero|rrn
 
-    with open(
-        "output/publicadora.ind", "r", encoding="utf-8"
-    ) as indice_secundario_publicadora:
-        indice_pub = []
+    with open("output/publicadora.ind", "r", encoding="utf-8") as indice_secundario_publicadora:
+        index_publicadora = []
         for linha in indice_secundario_publicadora:
             campos = linha.strip().split("|")
-            indice_pub.append(
-                [campos[0], int(campos[1])]
-            )  # Lê o publicadora.ind -> publicadora|rrn
+            index_publicadora.append([campos[0], int(campos[1])])  # Lê o publicadora.ind -> publicadora|rrn
 
-    with open(
-        "output/lista_invertida.lst", "r", encoding="utf-8"
-    ) as lista_invertida_file:
+    with open("output/lista_invertida.lst", "r", encoding="utf-8") as lista_invertida_file:
         lista_invertida = []
         for linha in lista_invertida_file:
             campos = linha.strip().split("|")
             lista_invertida.append(
                 [campos[0], int(campos[1]), int(campos[2])]
             )  # Lê o lista_invertida.lst -> id|prox_gen|prox_pub
-    return (indice_id, indice_gen, indice_pub, lista_invertida)
+    return (index_primario, index_genero, index_publicadora, lista_invertida)
