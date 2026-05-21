@@ -94,9 +94,11 @@ def remover_jogo(arg_id: int, index_primario: list[list], lista_invertida: list[
 
         index_primario.pop(rrn_index)  # Remove o jogo do índice primário
 
+        str_id = str(arg_id)  # Transforma o ID procurado em string
         for i in range(len(lista_invertida)):
-            if int(lista_invertida[i][0]) == arg_id:
+            if lista_invertida[i][0] == str_id:
                 lista_invertida[i][0] = "*"
+                break
 
         indices.salvar_indice(index_primario, "primario.ind")
         indices.salvar_lista_invertida(lista_invertida, "lista_invertida.lst")
