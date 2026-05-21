@@ -40,12 +40,14 @@ def encontra_posicao(
         rrn_anterior = -1
 
         while rrn_apontado != -1:
-            id_comparado = int(lista_invertida[rrn_apontado][0])
+            marcador = "*"
 
-            if id_comparado > int(id):
-                break
+            id_comparado = lista_invertida[rrn_apontado][0]
+            if str(id_comparado) != marcador:
+                if int(id_comparado) > int(id):
+                    break
 
-            # Se o ID jogador é maior, ele o RRN como anterior e vai pro próximo
+            # Se o ID jogador é maior ou o registro foi removido, ele o RRN como anterior e vai pro próximo
             rrn_anterior = rrn_apontado
             rrn_apontado = int(lista_invertida[rrn_apontado][coluna])
 
